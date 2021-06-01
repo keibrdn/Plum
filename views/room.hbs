@@ -1,0 +1,228 @@
+
+
+<div class="text-left mx-5 my-5">
+    <h1> {{ roomName }} </h1>
+    <p class="d-none" id="theName">{{ roomName }}</p>
+    <p>Please ensure you are logged in before sending a message. If you would like to search for a specific chat message, use the search bar given below. Happy chatting :-) !</p>
+
+    <div>
+      <input id="searchBar" type="search" placeholder="  Search in tweets" style="border-radius: 30px; border-color: #4AB3F4; border-width: 2px;">
+      <input type="checkbox">
+      <button class="btn btn-sm tweet"><b>Tweet</b></button>
+    </div>
+
+<div class="mx-5 px-5" id="tweet-container"></div>
+
+
+    <div id="list-template" class="row" style="margin-top: 100px; margin-left: 400px; width: 500px; border-radius: 2px; border-color:palevioletred; border-style:dotted;">
+            {{#if true}}
+            <ul style="list-style: none">
+                {{#each chat}}
+                    <li><b>{{this.author}}</b> at {{this.date}}: {{this.text}}</li>
+                    
+                {{/each}}
+            </ul>
+            {{/if}}
+    </div>
+</div>
+
+<form class="row" style="margin-left: 535px;" action="/createMsg" method="POST">
+    <input type="text" name="chatBox" placeholder="Type a message">
+    <input type="hidden" name="roomName" value={{roomName}}>
+    <input type="submit" value="Send message"/>
+</form>
+
+
+<script src="https://twitter.github.io/typeahead.js/js/handlebars.js"></script>
+<script>
+    window.addEventListener('load', function () {
+        setInterval(async function(){
+            fetch('http://localhost:8080/getChat')
+                .then(response => response.json())
+                .then(data => {
+                    var chatsJson = data;
+                    console.log(chatsJson);
+                    var html = "";
+                    var ul_element = document.getElementById('list-template');
+                    
+                    document.getElementById('list-template').innerHTML=" "
+
+                    for(var j = 0; j < chatsJson.length; ++j) {
+                        if(chatsJson[j].roomName == document.getElementById('theName').innerHTML) {
+                            var br = document.createElement('br')
+                            var li = document.createElement('li');
+                            var b = document.createElement('b');
+
+                            //br.innerHTML = "";
+                            b.innerHTML = chatsJson[j].author;
+                            li.appendChild(b);
+                            
+                            document.getElementById('list-template').appendChild(li);
+                           
+                            li.innerHTML = li.innerHTML + " at " + data[j].date + ": " + data[j].text;
+                
+                            
+                        }
+                    }
+
+                })
+                .catch(err => {
+                    console.log("ERROR" + err)
+                });
+        }, 5000);
+    });
+</script>
+
+<script>
+    var myData;
+	var j = 0;
+	var id_list = [];
+	var tweets_list = []; //chats, not tweets 
+    var flag = 1;
+    var intervalID;
+    var searchString = "" // here we use a global variable
+    var filteredResult = [];
+
+    window.onload=function(){
+                //SEARCHBAR EVENT
+                const handleSearch = event => {
+                    searchString = event.target.value.trim().toLowerCase(); 
+                    refreshTweets(tweets_list);
+                }
+                document.getElementById("searchBar").addEventListener("input", handleSearch)
+
+        intervalID = setInterval(test, 5000);
+        document.querySelector("input[type=checkbox]").addEventListener("change", function() {
+            flag = 1 - flag;
+            if (flag == 1) {
+                intervalID = setInterval(test, 5000);
+            }
+            
+            else {
+                clearInterval(intervalID);
+            }
+        }, false);
+            
+
+            function test(){
+                fetch('http://localhost:8080/getChat')
+                .then(res => res.json()) .then(data => {  
+                    myData = data;
+                  //  myFunc();x
+                  tweets_list = myData;
+                  console.log("tweets_list:");
+                  console.log(tweets_list);
+
+                }).catch(err => {console.log(err) })
+            }
+    
+           /** function myFunc() {
+                console.log("myFunc", tweets_list.length)
+                var isID = 0;
+                for(var j = 0; j < 10; ++j) {
+                    for(var i = 0; i < id_list.length; ++i) {
+                        if (myData.statuses[j].id == id_list[i]) {
+                            isID = 1;
+                        }
+                    }
+                    if(isID == 0) {
+                        id_list.push(myData.statuses[j].id);
+                        tweets_list.push(myData.statuses[j]);
+                    }
+                }
+            }
+            */
+
+            const tweetContainer = document.getElementById('tweet-container');
+
+            /**
+             * Removes all existing tweets from tweetList and then append all tweets back in
+             *
+             * @param {Array<Object>} tweets - A list of tweets
+             * @returns None, the tweets will be renewed
+             */
+            function refreshTweets(tweet_list) {
+               
+                // feel free to use a more complicated heuristics like in-place-patch, for simplicity, we will clear all tweets and append all tweets back
+                // {@link https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript}
+                while (tweetContainer.firstChild) {
+                    tweetContainer.removeChild(tweetContainer.firstChild);
+                }
+
+                // create an unordered list to hold the tweets
+                // {@link https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement}
+                const tweetList = document.createElement("ul");
+                // append the tweetList to the tweetContainer
+                // {@link https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild}
+                tweetContainer.appendChild(tweetList);
+
+                // all tweet objects (no duplicates) stored in tweets variable
+                console.log("tweet_list2:");
+                console.log(tweet_list);
+                // filter on search text
+                // {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter}
+                filteredResult = tweet_list.filter(tweet_list => tweet_list.text.search(searchString) != -1);
+                // sort by date
+                // {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort}
+                const sortedResult = filteredResult;
+                
+                console.log("sortedResult:");
+                console.log(sortedResult);
+                // console.log(filteredResult.created_at);
+                // execute the arrow function for each tweet
+                // {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach}
+                sortedResult.forEach(tweetObject => {
+                    // create a container for individual tweet
+                    const tweet = document.createElement("li");
+                    
+                    // const moment = require('moment');
+                    //var date = moment(tweetObject.created_at).format("MMM M");
+                    //var tweetTime = document.createTextNode(date);
+                    // e.g. create a div holding tweet content
+                    const tweetContent = document.createElement("div");
+                    tweetContent.style.backgroundColor = "white";
+                    tweetContent.style.padding = "25px"
+                    tweetContent.style.borderBottom = "1px solid #e6ecf0";
+                    
+                    var bold = document.createElement('b');
+                    /**var dateDiv = document.createElement('p');
+                    dateDiv.style.color = "grey";
+                    dateDiv.style.display = "inline";
+                    dateDiv.style.paddingLeft = "13px";*/
+                    // create a text node "safely" with HTML characters escaped
+                    // {@link https://developer.mozilla.org/en-US/docs/Web/API/Document/createTextNode}
+                    var tweetAuthor = document.createTextNode(tweetObject.author);
+                    const tweetText = document.createTextNode(tweetObject.text);
+
+                    console.log("author:");
+                    console.log(tweetAuthor);
+                    console.log("text:");
+                    console.log(tweetText);
+                
+                    //var tweetImg = document.createElement("img");
+                    const newline2 = document.createElement("br");
+                    const newline = document.createElement("br");
+                    //tweetImg.src = tweetObject.user.profile_image_url;
+                    //tweetImg.style.borderRadius = "50%";
+                    //tweetImg.style.paddingRight = "10px";
+                    // append the text node to the div
+                   // tweetContent.appendChild(tweetImg);
+                    bold.appendChild(tweetAuthor);
+                    //dateDiv.appendChild(tweetTime)
+                    tweetContent.appendChild(bold);
+                    //tweetContent.appendChild(dateDiv);
+                    tweetContent.appendChild(newline);
+                    tweetContent.appendChild(tweetText);
+                    tweetContent.appendChild(newline2);
+
+                    // you may want to put more stuff here like time, username...
+                    tweet.appendChild(tweetContent);
+
+                    // finally append your tweet into the tweet list
+                    tweetList.appendChild(tweet);
+                    console.log(tweet);
+                  
+                });
+            }
+    }
+</script>

@@ -1,0 +1,14 @@
+/* TODO: style each page */
+h1 {
+    color: #835983;
+    font-family: 'Press Start 2P', cursive;
+}
+
+a {
+    color: green;
+}
+
+a:hover {
+    color: green;
+    transition: 1000ms;
+}

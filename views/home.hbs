@@ -1,0 +1,53 @@
+<div class="text-center mx-5 my-5">
+    <h1> Welcome to PlumChat! </h1>
+    <p> Choose from the chatrooms below, or create a new room using the text field below</p>
+
+    {{#if isAvailable}}
+    <ul id="list-template" style="list-style: none">
+        {{#each rooms}}
+            <li> 
+                <a style="color: #cc8068; font-weight: bold;" href={{this.name}}> {{this.name}}  </a>
+            </li>
+        {{/each}}
+    </ul>
+    {{/if}}
+
+    <form action="/create" method="POST">
+    <input type="text" name="roomName" placeholder="enter room name"/>
+    <input type="submit" value="create room"/> 
+    </form>
+    <br><br><br>
+    <img style="width: 540px; height: 250px;" src="https://i.ibb.co/WD9Wg5s/plumpic.png">
+</div>
+
+<script src="https://twitter.github.io/typeahead.js/js/handlebars.js"></script>
+<script>
+    window.addEventListener('load', function () {
+        setInterval(async function(){
+            fetch('http://localhost:8080/getRoom')
+                .then(response => response.json())
+                .then(data => {
+                    var roomsJson = data;
+                    console.log(roomsJson);
+                    var html = "";
+                    var ul_element = document.getElementById('list-template');
+                    
+                    document.getElementById('list-template').innerHTML=" "
+
+                    for(var j = 0; j < roomsJson.length; ++j) {
+                        var li = document.createElement('li');
+                        var a = document.createElement('a');
+                        a.setAttribute('style', 'color:  #cc8068; font-weight: bold')
+                        a.setAttribute('href', roomsJson[j].name)
+                        li.appendChild(a);
+                        document.getElementById('list-template').appendChild(li)
+                        a.innerHTML = a.innerHTML + roomsJson[j].name
+                    }
+
+                })
+                .catch(err => {
+                    console.log("ERROR" + err)
+                });
+        }, 5000);
+    });
+</script>
