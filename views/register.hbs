@@ -1,6 +1,49 @@
-<h1>Signup</h1>
-<form action="/api/register" method="POST">
-    <input type="text" name="username" placeholder="enter username"/>
-    <input type="text" name="password" placeholder="enter password"/>
-    <input type="submit" value="submit"/> 
-</form>
+<br><br><br><br><br><br><br><br><br><br><br>
+<div class="text-center" id="regbox">
+	<h1> Registration<img style="width: 100px; height: 50px;" src="https://i.ibb.co/WD9Wg5s/plumpic.png"></h1>
+	<p>Please enter your desired username and password</p>
+
+	<form id="reg-form">
+			<input type="text" id="username" placeholder="username" />
+			<input type="password" id="password" placeholder="password" />
+			<input id="button" type="submit" value="Register" />
+	</form>
+	<br>
+	<div class="text-center">
+		<a href="/">Home</a>
+		<br>
+		<a href="/login">Login</a>
+	</div>
+</div>
+
+	
+		
+
+		<script>
+			const form = document.getElementById("reg-form")
+			form.addEventListener("submit", registerUser)
+
+			async function registerUser(event) {
+
+				const username = document.getElementById("username").value
+				const password = document.getElementById("password").value
+
+				const result = await fetch ("/api/register", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body : JSON.stringify({
+						username, password
+					})
+				}).then((res) =>res.json())
+
+				if(result.status === "ok"){
+					alert("success")
+				}else{
+					alert(result.error)
+				}
+
+			}
+
+		</script>

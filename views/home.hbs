@@ -1,12 +1,19 @@
-<div class="text-center mx-5 my-5">
-    <h1> Welcome to PlumChat! </h1>
-    <p> Choose from the chatrooms below, or create a new room using the text field below</p>
-
+<iframe width="0" height="0" src="https://www.youtube.com/embed/6rTdW-651Lw?start=6&autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<div class="text-right mx-5 my-3">
+    <a style="font-weight: bold; color: white; background-color: #835983; padding: 10px; border-radius: 10px; margin: 5px;" href="/login">Login</a>
+    <a style="font-weight: bold; color: white; background-color: #835983; padding: 10px; border-radius: 10px; margin: 5px;" href="/register">Signup</a>
+</div>
+<br>
+<div class="text-center mx-5 my-3">
+    <h1><img style="width: 40px; height: 40px" src="https://imgur.com/Aadciuh.gif"> Welcome to PlumChat!<img style="width: 40px; height: 40px" src="https://imgur.com/Aadciuh.gif"></h1> 
+    <p style="justify-content: center; margin-left: 200px; margin-right: 200px;">An inclusive space where women in tech can network, make friends, chat about shared interests, and more! Feel free to start chatting in one of our existing chat rooms below, or create a room of your own!</p>
+    <br>
     {{#if isAvailable}}
     <ul id="list-template" style="list-style: none">
         {{#each rooms}}
             <li> 
                 <a style="color: #cc8068; font-weight: bold;" href={{this.name}}> {{this.name}}  </a>
+                <h5 style="color: #FFF9F1">hai :3</h5>
             </li>
         {{/each}}
     </ul>
@@ -14,7 +21,7 @@
 
     <form action="/create" method="POST">
     <input type="text" name="roomName" placeholder="enter room name"/>
-    <input type="submit" value="create room"/> 
+    <input id="button" type="submit" value="create room"/> 
     </form>
     <br><br><br>
     <img style="width: 540px; height: 250px;" src="https://i.ibb.co/WD9Wg5s/plumpic.png">
@@ -37,17 +44,21 @@
                     for(var j = 0; j < roomsJson.length; ++j) {
                         var li = document.createElement('li');
                         var a = document.createElement('a');
+                        var h5 = document.createElement('h5')
+                        h5.innerHTML = "Hai :3";
+                        h5.setAttribute('style', 'color: #FFF9F1')
                         a.setAttribute('style', 'color:  #cc8068; font-weight: bold')
                         a.setAttribute('href', roomsJson[j].name)
                         li.appendChild(a);
                         document.getElementById('list-template').appendChild(li)
                         a.innerHTML = a.innerHTML + roomsJson[j].name
+                        li.append(h5)
                     }
 
                 })
                 .catch(err => {
                     console.log("ERROR" + err)
                 });
-        }, 5000);
+        }, 3000);
     });
 </script>

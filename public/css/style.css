@@ -12,3 +12,17 @@ a:hover {
     color: green;
     transition: 1000ms;
 }
+
+.bg {
+    background-image: url(https://ibb.co/mhX3hXH);
+}
+
+input {
+    border-radius: 10px;
+}
+
+button, #button {
+    border-radius: 10px;
+    background-color: #835983;
+    color: white;
+}

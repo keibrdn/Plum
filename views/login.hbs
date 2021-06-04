@@ -1,6 +1,51 @@
-<h1>Login</h1>
-<form action="/api/login" method="POST">
-    <input type="text" name="username" placeholder="enter username"/>
-    <input type="text" name="password" placeholder="enter password"/>
-    <input type="submit" value="submit"/> 
-</form>
+	<br><br><br><br><br><br><br><br><br><br><br>
+	<div class="text-center margin-top: 50%;" style="border-style: solid; border-color: #835983;">
+		<h1>Login<img style="width: 100px; height: 50px;" src="https://i.ibb.co/WD9Wg5s/plumpic.png"></h1>
+		<p> Please login below with your username and password</p>
+
+		<form id="login">
+			<input type="text" autocomplete="off" id="username" placeholder="Username" />
+			<input type="password" autocomplete="off" id="password" placeholder="Password" />
+			<input id="button" type="submit" value="Start Chatting!" />
+		</form>
+        <a href="/passReset">Forgot password?</a>
+	</div>
+<br>
+	<div class="text-center">
+		<a href="/">Home</a>
+		<br>
+		<a href="/register">Register</a>
+	</div>
+
+		
+
+		<script>
+			const form = document.getElementById('login')
+			form.addEventListener('submit', login)
+
+			async function login(event) {
+				event.preventDefault()
+				const username = document.getElementById('username').value
+				const password = document.getElementById('password').value
+
+				const result = await fetch('/api/login', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						username,
+						password
+					})
+				}).then((res) => res.json())
+
+				if (result.status === 'ok') {
+					// everythign went fine
+					console.log('Got the token: ', result.data)
+					localStorage.setItem('token', result.data)
+					alert('Success')
+				} else {
+					alert(result.error)
+				}
+			}
+		</script>

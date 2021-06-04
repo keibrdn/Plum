@@ -4,17 +4,18 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser')
 const hbs = require('express-handlebars');
 const User = require('./models/User');
+const Chat = require('./models/Chat');
 const mongoose = require('mongoose');
 const config = require('config');
 const path = require('path');
 const Room = require('./models/Rooms');
-const Chat = require('./models/Chat');
 const roomIdGenerator = require('./util/roomIdGenerator');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken")
 const JWT_SECRET="jsdjfsjfksdfjhsdjfhdsfkjsdhf87879837937987*&&%^$%$^&^&^&^ksjhfkdhfksdhkfjhdskfjhdsk"
 
 var myAuthor;
+var myChat;
 // import handlers
 const homeHandler = require('./controllers/home.js');
 const roomHandler = require('./controllers/room.js');
@@ -34,6 +35,8 @@ app.use(bodyParser.json())
 
 const db = config.get('mongoURI');
 
+
+
 mongoose
   .connect(db, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false })
   .then(() => console.log('MongoDB Connected...'))
@@ -51,9 +54,11 @@ app.set('view engine', 'hbs');
 // TODO: Add server side code
 
 // Create controller handlers to handle requests at each endpoint
+
 app.post('/api/change-password', async (req, res) => {
 	const { token, newpassword: plainTextPassword } = req.body
-
+	console.log(plainTextPassword);
+	console.log(token);
 	if (!plainTextPassword || typeof plainTextPassword !== 'string') {
 		return res.json({ status: 'error', error: 'Invalid password' })
 	}
@@ -83,7 +88,9 @@ app.post('/api/change-password', async (req, res) => {
 	} catch (error) {
 		console.log(error)
 		res.json({ status: 'error', error: ';))' })
+		console.log(req.body);
 	}
+
 })
 
 app.post('/api/login', async (req, res) => {
@@ -106,6 +113,7 @@ app.post('/api/login', async (req, res) => {
 		)
 		res.cookie("username", username);
 		myAuthor = req.cookies.username;
+
 
 		return res.json({ status: 'ok', data: token })
 	}
@@ -139,8 +147,6 @@ app.post('/api/register', async (req, res) => {
 		console.log(error)
 		return res.json({status:"error"})
 	}
-
-
 })
 
 app.post("/create", function(req, res){
@@ -152,14 +158,44 @@ app.post("/create", function(req, res){
     .catch(e => console.log(e))
 })
 
+app.post("/myEdit", function(req, res){
+	console.log('pweas')
+	var myChat = req.body.chatID2
+	var newChat = req.body.chatBox2
+	var myquery = { ID: myChat };
+	var newvalues = { $set: { text: newChat } };
+	Chat.updateOne(myquery, newvalues, function(err, res) {
+		console.log(err);
+	})
+	
+})
+
+
+app.post("/delete", function(req, res){
+	var myChat = req.body.chatID;
+	console.log("ID of chat getting removed: " + myChat)
+
+	Chat.deleteOne(
+		{
+			ID: myChat
+			
+		},
+		function(err) {
+			console.log(err);
+		}
+		
+	)
+})
+
 app.post("/createMsg", function(req, res){
-	console.log(myAuthor);
-	console.log('HELLO.');
     const newChat = new Chat({
         author: myAuthor,
         text: req.body.chatBox,
-        roomName: req.body.roomName
+        roomName: req.body.roomName,
+		ID: roomIdGenerator.roomIdGenerator()
     })
+
+
     newChat.save().then(console.log("chat added" + req.body.roomName))
     .catch(e => console.log(e))
 })

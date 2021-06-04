@@ -17,6 +17,10 @@ const ChatSchema = new Schema({
   roomName: {
     type: String,
     required: true
+  },
+  ID: {
+    type: String,
+    required: true
   }
 
 });
